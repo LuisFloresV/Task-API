@@ -48,6 +48,13 @@ const taskThree = {
   owner: userSecond._id
 }
 
+const taskFour = {
+  _id: mongoose.Types.ObjectId(),
+  description: 'Learn Spanish',
+  completed: true,
+  owner: userOne._id
+}
+
 const setupDb = async () => {
   await User.deleteMany()
   await Task.deleteMany()
@@ -56,6 +63,7 @@ const setupDb = async () => {
   await new Task(taskOne).save()
   await new Task(taskTwo).save()
   await new Task(taskThree).save()
+  await new Task(taskFour).save()
 }
 
 module.exports = {

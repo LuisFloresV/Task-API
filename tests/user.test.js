@@ -35,6 +35,39 @@ test('Should signup a new user', async () => {
 
 })
 
+test('Should not sign up user with invalid name', async () => {
+  request(app)
+    .post('/users')
+    .send({
+      name: "Naoko120",
+      email: "naokodeveloper@gmail.com",
+      password: "aprilfeb50D."
+    })
+    .expect(500)
+})
+
+test('Should not sign up user with invalid email', async () => {
+  request(app)
+    .post('/users')
+    .send({
+      name: "Naoko120",
+      email: "luisemail.com",
+      password: "aprilfeb50D."
+    })
+    .expect(500)
+})
+
+
+test('Should not sign up user with invalid password', async () => {
+  request(app)
+    .post('/users')
+    .send({
+      name: "Naoko120",
+      email: "luisemail.com",
+      password: "aprilfebpassword."
+    })
+    .expect(500)
+})
 
 test('Should update valid user fields', async () => {
   await request(app)
@@ -46,6 +79,45 @@ test('Should update valid user fields', async () => {
     .expect(200)
   const user = await User.findById(userOneId)
   expect(user.name).toEqual('Naoko Banana')
+})
+
+test('Should not update user with invalid name', async () => {
+  await request(app)
+    .patch('/users/me')
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send({
+      'name': 'Naoko123'
+    })
+    .expect(500)
+})
+
+test('Should not update user with invalid email', async () => {
+  await request(app)
+    .patch('/users/me')
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send({
+      'email': 'naoko.com'
+    })
+    .expect(500)
+})
+
+test('Should not update user with invalid password', async () => {
+  await request(app)
+    .patch('/users/me')
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send({
+      'password': 'password123'
+    })
+    .expect(500)
+})
+
+test('Should not update user without auth', async () => {
+  await request(app)
+    .patch('/users/me')
+    .send({
+      'name': 'Naoko Banana'
+    })
+    .expect(401)
 })
 
 test('Should not update invalid user fields', async () => {
