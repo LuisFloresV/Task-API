@@ -27,18 +27,9 @@ const userSchema = new mongoose.Schema({
       }
     }
   },
-  age: {
-    type: Number,
-    default: 0,
-    validate(value) {
-      if (value < 0) {
-        throw new Error('Age cant be negative!')
-      }
-    }
-  },
   password: {
     type: String,
-    minLength: [7, 'At least 6 characters'],
+    minLength: [6, 'At least 6 characters'],
     required: true,
     trim: true,
     validate(value) {
