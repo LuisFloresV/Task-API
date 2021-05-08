@@ -10,9 +10,8 @@ const userOne = {
   name: "Naoko",
   email: "naoko@test.com",
   password: "aprilfeb690.",
-  tokens: [{
-    token: jwt.sign({ _id: userOneId }, process.env.JWT_SECRET)
-  }]
+  token: jwt.sign({ _id: userOneId }, process.env.JWT_SECRET)
+
 }
 
 const userSecondId = new mongoose.Types.ObjectId()
@@ -22,9 +21,7 @@ const userSecond = {
   name: "Naruto",
   email: "naruto@test.com",
   password: "aprieb600",
-  tokens: [{
-    token: jwt.sign({ _id: userSecondId }, process.env.JWT_SECRET)
-  }]
+  token: jwt.sign({ _id: userSecondId }, process.env.JWT_SECRET)
 }
 
 const taskOne = {

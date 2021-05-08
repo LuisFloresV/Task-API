@@ -6,6 +6,7 @@ const multer = require('multer')
 const auth = require('../middleware/auth')
 const response = require('../utils/response')
 const { sendWelcomeEmail, sendCancelEmail } = require('../utils/emails/accounts')
+const jwt = require('jsonwebtoken')
 
 //Multer config
 const upload = multer({
@@ -57,7 +58,7 @@ router.post('/users', async (req, res, next) => {
   const user = new User(req.body)
   try {
     await user.save()
-    sendWelcomeEmail(user.email, user.name)
+    // sendWelcomeEmail(user.email, user.name)
     const token = await user.generateAuthToken()
     response.success(req, res, { user, token }, 201)
   } catch (error) {
@@ -65,38 +66,44 @@ router.post('/users', async (req, res, next) => {
   }
 })
 
-router.post('/users/login', async (req, res, next) => {
-  try {
-    const user = await User.findByCredentials(req.body.email, req.body.password)
-    const token = await user.generateAuthToken()
-    response.success(req, res, { user, token }, 201)
-  } catch (error) {
-    next(error)
-  }
+router.get('/users/token/validate', async (req, res, next) => {
+  const token = req.header('Authorization').replace('Bearer', '').trim()
+  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+    if (err) {
+      if (err.name == "TokenExpiredError") {
+        const user = await User.findOne({ 'token': token })
+        const refreshedToken = await user.generateAuthToken()
+        response.success(req, res, { status: 'New Token', token: refreshedToken }, 201)
+      }
+    }
+    else {
+      response.success(req, res, { tokenValid: 'true' }, 200)
+    }
+  })
 })
 
 
-router.post('/users/logout', auth, async (req, res, next) => {
-  try {
-    req.user.tokens = req.user.tokens.filter((token) => {
-      return token.token !== req.token
-    })
-    await req.user.save()
-    response.success(req, res, 'Logged Out', 200)
-  } catch (error) {
-    next(error)
-  }
-})
+// router.post('/users/logout', auth, async (req, res, next) => {
+//   try {
+//     req.user.tokens = req.user.tokens.filter((token) => {
+//       return token.token !== req.token
+//     })
+//     await req.user.save()
+//     response.success(req, res, 'Logged Out', 200)
+//   } catch (error) {
+//     next(error)
+//   }
+// })
 
-router.post('/users/logoutAll', auth, async (req, res, next) => {
-  try {
-    req.user.tokens = []
-    await req.user.save()
-    response.success(req, res, '', 200)
-  } catch (error) {
-    next(error)
-  }
-})
+// router.post('/users/logoutAll', auth, async (req, res, next) => {
+//   try {
+//     req.user.tokens = []
+//     await req.user.save()
+//     response.success(req, res, '', 200)
+//   } catch (error) {
+//     next(error)
+//   }
+// })
 
 router.get('/users/me', auth, async (req, res, next) => {
   response.success(req, res, req.user, 200)
@@ -126,11 +133,13 @@ router.patch('/users/me', auth, async (req, res, next) => {
 router.delete('/users/me', auth, async (req, res, next) => {
   try {
     await req.user.remove()
-    sendCancelEmail(req.user.email, req.user.name)
+    // sendCancelEmail(req.user.email, req.user.name)
     response.success(req, res, req.user, 200)
   } catch (error) {
     next(error)
   }
 })
+
+
 
 module.exports = router
