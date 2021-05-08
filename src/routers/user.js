@@ -66,6 +66,16 @@ router.post('/users', async (req, res, next) => {
   }
 })
 
+router.post('/users/login', async (req, res, next) => {
+  try {
+    const user = await User.findByCredentials(req.body.email, req.body.password)
+    const token = await user.generateAuthToken()
+    response.success(req, res, { user, token }, 201)
+  } catch (error) {
+    next(error)
+  }
+})
+
 router.get('/users/token/validate', async (req, res, next) => {
   const token = req.header('Authorization').replace('Bearer', '').trim()
   jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
