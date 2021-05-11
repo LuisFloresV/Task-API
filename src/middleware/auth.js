@@ -9,6 +9,9 @@ const auth = async function (req, res, next) {
         if (err.name == "TokenExpiredError") {
           response.error(req, res, { tokenExpired: true }, 500)
         }
+        else {
+          response.error(req, res, err, 500)
+        }
       } else {
         const user = await User.findOne({ _id: decoded._id, 'token': token })
         if (!user) {

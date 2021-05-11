@@ -80,11 +80,15 @@ userSchema.methods.generateAuthToken = async function () {
 userSchema.statics.findByCredentials = async (email, password) => {
   const user = await User.findOne({ email })
   if (!user) {
-    throw new Error('Unable to log in!')
+    const error = new Error('Unable to log in!')
+    error.code = 404
+    throw error
   }
   const isMatch = await bcrypt.compare(password, user.password)
   if (!isMatch) {
-    throw new Error('Unable to log in!')
+    const error = new Error('Unable to log in!')
+    error.code = 400
+    throw error
   }
   return user
 }

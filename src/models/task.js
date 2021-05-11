@@ -7,7 +7,7 @@ const taskSchema = new mongoose.Schema({
     trim: true,
     validate(value) {
       if (/\d+/.test(value)) {
-        throw new Error('No numbers accepted!')
+        throw new Error('No numbers accepted')
       }
     }
   },
