@@ -6,16 +6,13 @@ const auth = async function (req, res, next) {
     const token = req.header('Authorization').replace('Bearer', '').trim()
     jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
       if (err) {
-        if (err.name == "TokenExpiredError") {
-          response.error(req, res, { tokenExpired: true }, 500)
-        }
-        else {
-          response.error(req, res, err, 500)
-        }
+        err.name === 'TokenExpiredError' ? response.error(req, res, { tokenExpired: true }, 500) : response.error(req, res, err, 500)
       } else {
         const user = await User.findOne({ _id: decoded._id, 'token': token })
         if (!user) {
-          next(new Error('No user!'))
+          const error = new Error('No user!')
+          error.code = 404
+          next(error)
         }
         req.token = token
         req.user = user
