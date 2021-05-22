@@ -74,6 +74,15 @@ router.patch('/tasks/:id', auth, async (req, res, next) => {
   }
 })
 
+router.delete('/tasks', auth, async (req, res, next) => {
+  try {
+    const task = await Task.deleteMany({ owner: req.user._id })
+    task ? response.success(req, res, task, 200) : response.error(req, res, "Task Not Found", 404)
+  } catch (error) {
+    next(error)
+  }
+})
+
 router.delete('/tasks/:id', auth, async (req, res, next) => {
   try {
     const task = await Task.findOneAndDelete({ _id: req.params.id, owner: req.user._id })
