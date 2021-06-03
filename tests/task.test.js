@@ -19,7 +19,6 @@ test('Should create task for user', async () => {
   expect(task.completed).toEqual(false)
 })
 
-
 test('Should not create task with invalid description', async () => {
   const response = await request(app)
     .post('/tasks')

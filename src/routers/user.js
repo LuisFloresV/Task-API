@@ -1,10 +1,14 @@
 const express = require('express')
+
 const router = express.Router()
 const upload = require('../middleware/multer')
 const auth = require('../middleware/auth')
-const { deleteAvatar, getAvatar, uploadAvatar, postUser, loginUser, validateToken, deleteUser, patchUser, userMe } = require('../controllers/user')
+const {
+  deleteAvatar, getAvatar, uploadAvatar, postUser, loginUser, validateToken,
+  deleteUser, patchUser, userMe,
+} = require('../controllers/user')
 
-//Multer config
+// Multer config
 router.route('/users/me/avatar')
   .post(auth, upload.single('avatar'), uploadAvatar)
   .delete(auth, deleteAvatar)

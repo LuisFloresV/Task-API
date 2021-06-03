@@ -1,3 +1,4 @@
+/* eslint-disable func-names */
 const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcrypt')
@@ -13,7 +14,7 @@ const userSchema = new mongoose.Schema({
       if (/\d+/.test(value)) {
         throw new Error('No numbers accepted!')
       }
-    }
+    },
   },
   email: {
     unique: true,
@@ -25,7 +26,7 @@ const userSchema = new mongoose.Schema({
       if (!validator.isEmail(value)) {
         throw new Error('Needs to be a valid email')
       }
-    }
+    },
   },
   password: {
     type: String,
@@ -36,28 +37,25 @@ const userSchema = new mongoose.Schema({
       if (value.toLowerCase().includes('password')) {
         throw new Error('Password is not secure')
       }
-    }
+    },
   },
   token: {
     type: String,
-  }
-  ,
+  },
   avatar: {
-    type: Buffer
-  }
+    type: Buffer,
+  },
 }, {
-  timestamps: true
+  timestamps: true,
 })
 
 userSchema.virtual('tasks', {
   ref: 'Task',
   localField: '_id',
-  foreignField: 'owner'
+  foreignField: 'owner',
 })
 
-
-
-//to JSON 
+// to JSON
 userSchema.methods.toJSON = function () {
   const user = this
   const userObject = user.toObject()
@@ -67,7 +65,7 @@ userSchema.methods.toJSON = function () {
   return userObject
 }
 
-//Generate Authentication Token
+// Generate Authentication Token
 userSchema.methods.generateAuthToken = async function () {
   const user = this
   const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET, { expiresIn: '24h' })
@@ -76,7 +74,7 @@ userSchema.methods.generateAuthToken = async function () {
   return token
 }
 
-//Return user if correct credentials
+// Return user if correct credentials
 userSchema.statics.findByCredentials = async (email, password) => {
   const user = await User.findOne({ email })
   if (!user) {
@@ -93,7 +91,7 @@ userSchema.statics.findByCredentials = async (email, password) => {
   return user
 }
 
-//Hash password
+// Hash password
 userSchema.pre('save', async function (next) {
   const user = this
   if (user.isModified('password')) {
@@ -102,7 +100,7 @@ userSchema.pre('save', async function (next) {
   next()
 })
 
-//Delete user tasks when user is removed
+// Delete user tasks when user is removed
 userSchema.pre('remove', async function (next) {
   const user = this
   await Task.deleteMany({ owner: user._id })

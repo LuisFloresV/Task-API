@@ -9,19 +9,19 @@ const taskSchema = new mongoose.Schema({
       if (/\d+/.test(value)) {
         throw new Error('No numbers accepted')
       }
-    }
+    },
   },
   completed: {
     type: Boolean,
-    default: false
+    default: false,
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'User'
-  }
+    ref: 'User',
+  },
 }, {
-  timestamps: true
+  timestamps: true,
 })
 
 const Task = mongoose.model('Task', taskSchema)

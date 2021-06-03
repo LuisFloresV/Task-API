@@ -5,7 +5,7 @@ exports.postTask = async (req, res, next) => {
   try {
     const task = new Task({
       ...req.body,
-      owner: req.user._id
+      owner: req.user._id,
     })
     await task.save()
     response.success(req, res, task, 201)
@@ -14,10 +14,9 @@ exports.postTask = async (req, res, next) => {
   }
 }
 
-
-//GET /tasks?completed=true
-//GET /tasks?limit=10&skip=10
-//GET /tasks?sortBy=createdAt:asc
+// GET /tasks?completed=true
+// GET /tasks?limit=10&skip=10
+// GET /tasks?sortBy=createdAt:asc
 exports.getTask = async (req, res, next) => {
   try {
     const match = {}
@@ -33,7 +32,7 @@ exports.getTask = async (req, res, next) => {
       options: {
         limit: parseInt(req.query.limit),
         skip: parseInt(req.query.skip),
-        sort
+        sort,
       },
     }).execPopulate()
     response.success(req, res, req.user.tasks, 200)
@@ -45,7 +44,7 @@ exports.getTask = async (req, res, next) => {
 exports.getTaskId = async (req, res, next) => {
   try {
     const task = await Task.findOne({ _id: req.params.id, owner: req.user._id })
-    task ? response.success(req, res, task, 200) : response.error(req, res, "Not Found", 404)
+    task ? response.success(req, res, task, 200) : response.error(req, res, 'Not Found', 404)
   } catch (error) {
     next(error)
   }
@@ -54,16 +53,16 @@ exports.getTaskId = async (req, res, next) => {
 exports.patchTask = async (req, res, next) => {
   const updates = Object.keys(req.body)
   const allowedUpdates = ['description', 'completed']
-  const validOp = updates.every(update => allowedUpdates.includes(update))
+  const validOp = updates.every((update) => allowedUpdates.includes(update))
   if (!validOp) {
-    return response.error(req, res, "Invalid updates", 404)
+    return response.error(req, res, 'Invalid updates', 404)
   }
   try {
     const task = await Task.findOne({ _id: req.params.id, owner: req.user._id })
     if (!task) {
-      return response.error(req, res, "Task Not Found", 404)
+      return response.error(req, res, 'Task Not Found', 404)
     }
-    updates.forEach(update => task[update] = req.body[update])
+    updates.forEach((update) => task[update] = req.body[update])
     await task.save()
     response.success(req, res, task, 200)
   } catch (error) {
@@ -74,7 +73,7 @@ exports.patchTask = async (req, res, next) => {
 exports.deleteAllTasks = async (req, res, next) => {
   try {
     const task = await Task.deleteMany({ owner: req.user._id, completed: true })
-    task ? response.success(req, res, task, 200) : response.error(req, res, "Task Not Found", 404)
+    task ? response.success(req, res, task, 200) : response.error(req, res, 'Task Not Found', 404)
   } catch (error) {
     next(error)
   }
@@ -83,7 +82,7 @@ exports.deleteAllTasks = async (req, res, next) => {
 exports.deleteTaskId = async (req, res, next) => {
   try {
     const task = await Task.findOneAndDelete({ _id: req.params.id, owner: req.user._id })
-    task ? response.success(req, res, task, 200) : response.error(req, res, "Task Not Found", 404)
+    task ? response.success(req, res, task, 200) : response.error(req, res, 'Task Not Found', 404)
   } catch (error) {
     next(error)
   }
