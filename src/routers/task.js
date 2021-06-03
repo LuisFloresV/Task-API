@@ -3,11 +3,11 @@ const express = require('express')
 const router = express.Router()
 const auth = require('../middleware/auth')
 const {
-  postTask, getTask, getTaskId, patchTask, deleteAllTasks, deleteTaskId,
+  postTask, getTasks, getTaskId, patchTask, deleteAllTasks, deleteTaskId,
 } = require('../controllers/task')
 
 router.route('/tasks')
-  .get(auth, getTask)
+  .get(auth, getTasks)
   .post(auth, postTask)
   .delete(auth, deleteAllTasks)
 

@@ -3,18 +3,18 @@ const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 const response = require('../utils/response')
 
+const AppError = require('../utils/appError.js')
+
 const auth = async (req, res, next) => {
   try {
     const token = req.header('Authorization').replace('Bearer', '').trim()
     jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
       if (err) {
-        err.name === 'TokenExpiredError' ? response.error(req, res, { tokenExpired: true }, 500) : response.error(req, res, err, 500)
+        err.name === 'TokenExpiredError' ? next(new AppError('Token Expired', 401)) : next(new AppError('Invalid Token', 401))
       } else {
         const user = await User.findOne({ _id: decoded._id, token })
         if (!user) {
-          const error = new Error('No user!')
-          error.code = 404
-          next(error)
+          return next(new AppError('User Not Found', 404))
         }
         req.token = token
         req.user = user
@@ -22,7 +22,7 @@ const auth = async (req, res, next) => {
       }
     })
   } catch (error) {
-    res.status(401).send({ error: 'Please Authenticate' })
+    next(new AppError('Please authenticate', 401))
   }
 }
 

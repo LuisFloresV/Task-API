@@ -1,4 +1,5 @@
 const multer = require('multer')
+const AppError = require('../utils/appError')
 
 const upload = multer({
   limits: {
@@ -6,7 +7,7 @@ const upload = multer({
   },
   fileFilter(req, file, cb) {
     if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-      return cb(new Error('File must be an Image'))
+      return cb(new AppError('File must be an Image', 400))
     }
     cb(undefined, true)
   },

@@ -4,16 +4,18 @@ const validator = require('validator')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const Task = require('./task')
+const AppError = require('../utils/appError')
 
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
     trim: true,
-    validate(value) {
-      if (/\d+/.test(value)) {
-        throw new Error('No numbers accepted!')
-      }
+    validate: {
+      validator(val) {
+        return !/\d+/.test(val)
+      },
+      message: 'Username must contain only letters',
     },
   },
   email: {
@@ -22,21 +24,18 @@ const userSchema = new mongoose.Schema({
     required: true,
     trim: true,
     lowercase: true,
-    validate(value) {
-      if (!validator.isEmail(value)) {
-        throw new Error('Needs to be a valid email')
-      }
-    },
+    validate: [validator.isEmail, 'Email must follow the correct format'],
   },
   password: {
     type: String,
     minLength: [6, 'At least 6 characters'],
     required: true,
     trim: true,
-    validate(value) {
-      if (value.toLowerCase().includes('password')) {
-        throw new Error('Password is not secure')
-      }
+    validate: {
+      validator(val) {
+        return !val.toLowerCase().includes('password')
+      },
+      message: 'Insecure password',
     },
   },
   token: {
@@ -68,7 +67,7 @@ userSchema.methods.toJSON = function () {
 // Generate Authentication Token
 userSchema.methods.generateAuthToken = async function () {
   const user = this
-  const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET, { expiresIn: '24h' })
+  const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET, { expiresIn: '20sec' })
   user.token = token
   await user.save()
   return token
@@ -78,15 +77,11 @@ userSchema.methods.generateAuthToken = async function () {
 userSchema.statics.findByCredentials = async (email, password) => {
   const user = await User.findOne({ email })
   if (!user) {
-    const error = new Error('Unable to log in!')
-    error.code = 404
-    throw error
+    throw new AppError('Unable to log in', 400)
   }
   const isMatch = await bcrypt.compare(password, user.password)
   if (!isMatch) {
-    const error = new Error('Unable to log in!')
-    error.code = 400
-    throw error
+    throw new AppError('Unable to log in', 400)
   }
   return user
 }

@@ -1,6 +1,8 @@
 const request = require('supertest')
 const Task = require('../src/models/task')
-const { setupDb, userOne, userSecond, taskOneId } = require('./fixtures/db')
+const {
+  setupDb, userOne, userSecond, taskOneId,
+} = require('./fixtures/db')
 const app = require('../src/app')
 
 beforeEach(setupDb)
@@ -10,7 +12,7 @@ test('Should create task for user', async () => {
     .post('/tasks')
     .set('Authorization', `Bearer ${userOne.token}`)
     .send({
-      description: "Learn Js"
+      description: 'Learn Js',
     })
     .expect(201)
   const task = await Task.findById(response.body.response._id)
@@ -24,10 +26,10 @@ test('Should not create task with invalid description', async () => {
     .post('/tasks')
     .set('Authorization', `Bearer ${userOne.token}`)
     .send({
-      description: ""
+      description: '',
     })
-    .expect(500)
-  expect(response.body.error).toBe(true)
+    .expect(400)
+  expect(response.body.status).toBe('fail')
 })
 
 test('Should not create task with invalid completed status', async () => {
@@ -35,22 +37,21 @@ test('Should not create task with invalid completed status', async () => {
     .post('/tasks')
     .set('Authorization', `Bearer ${userOne.token}`)
     .send({
-      completed: ""
+      completed: '',
     })
-    .expect(500)
-  expect(response.body.error).toBe(true)
+    .expect(400)
+  expect(response.body.status).toBe('fail')
 })
-
 
 test('Should not update task with invalid description', async () => {
   const response = await request(app)
     .patch(`/tasks/${taskOneId}`)
     .set('Authorization', `Bearer ${userOne.token}`)
     .send({
-      description: ""
+      description: '',
     })
-    .expect(500)
-  expect(response.body.error).toBe(true)
+    .expect(400)
+  expect(response.body.status).toBe('fail')
 })
 
 test('Should not update task if not owner', async () => {
@@ -58,10 +59,10 @@ test('Should not update task if not owner', async () => {
     .patch(`/tasks/${taskOneId}`)
     .set('Authorization', `Bearer ${userSecond.token}`)
     .send({
-      description: "Learn JavaScript"
+      description: 'Learn JavaScript',
     })
     .expect(404)
-  expect(response.body.error).toBe(true)
+  expect(response.body.status).toBe('fail')
 })
 
 test('Should not update task with invalid completed status', async () => {
@@ -69,10 +70,10 @@ test('Should not update task with invalid completed status', async () => {
     .patch(`/tasks/${taskOneId}`)
     .set('Authorization', `Bearer ${userOne.token}`)
     .send({
-      completed: ""
+      completed: '',
     })
-    .expect(500)
-  expect(response.body.error).toBe(true)
+    .expect(400)
+  expect(response.body.status).toBe('fail')
 })
 
 test('Should get all tasks for user', async () => {
@@ -190,7 +191,6 @@ test('Should delete task if owner', async () => {
   const task = await Task.findById(taskOneId)
   expect(task).toBeNull()
 })
-
 
 test('Should not delete task if unauthenticated', async () => {
   await request(app)

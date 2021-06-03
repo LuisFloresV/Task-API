@@ -5,10 +5,13 @@ const taskSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    validate(value) {
-      if (/\d+/.test(value)) {
-        throw new Error('No numbers accepted')
-      }
+    maxlength: [30, 'Task description must have less or equal than 30 characters'],
+    minlength: [5, 'Task description must have more or equal than 5 characters'],
+    validate: {
+      validator(val) {
+        return !/\d+/.test(val)
+      },
+      message: 'Task description must contain only letters',
     },
   },
   completed: {

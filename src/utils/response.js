@@ -10,11 +10,10 @@ const success = (req, res, message = '', status = 200, opts = '') => {
   })
 }
 
-const error = (req, res, message = 'Internal Server Error', status = 500) => {
-  res.status(status).send({
-    error: true,
-    response: message,
-    status,
+const error = (res, err) => {
+  res.status(err.statusCode).json({
+    status: err.status,
+    message: err.message,
   })
 }
 

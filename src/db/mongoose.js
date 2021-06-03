@@ -5,9 +5,10 @@ async function connection() {
     await mongoose.connect(process.env.MONGODB_URL, {
       useNewUrlParser: true,
       useCreateIndex: true,
-      useUnifiedTopology: true,
       useFindAndModify: false,
+      useUnifiedTopology: true,
     })
+    console.log('Connected to the Mongo Cluster')
   } catch (error) {
     console.log(error)
   }

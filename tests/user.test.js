@@ -12,61 +12,59 @@ afterAll(async () => {
 
 test('Should signup a new user', async () => {
   const response = await request(app).post('/users').send({
-    name: "Naoko",
-    email: "naokodeveloper@gmail.com",
-    password: "aprilfeb50D."
+    name: 'Naoko',
+    email: 'naokodeveloper@gmail.com',
+    password: 'aprilfeb50D.',
   }).expect(201)
 
-  //DB was changed
+  // DB was changed
   const user = await User.findById(response.body.response.user._id)
   expect(user).not.toBeNull()
 
-  //Assertions about the response
+  // Assertions about the response
   expect(response.body.response).toMatchObject({
     user: {
       name: 'Naoko',
-      email: 'naokodeveloper@gmail.com'
+      email: 'naokodeveloper@gmail.com',
     },
-    token: user.token
+    token: user.token,
   })
 
-  //User password
+  // User password
   expect(user.password).not.toBe('aprilfeb50D.')
-
 })
 
 test('Should not sign up user with invalid name', async () => {
   request(app)
     .post('/users')
     .send({
-      name: "Naoko120",
-      email: "naokodeveloper@gmail.com",
-      password: "aprilfeb50D."
+      name: 'Naoko120',
+      email: 'naokodeveloper@gmail.com',
+      password: 'aprilfeb50D.',
     })
-    .expect(500)
+    .expect(400)
 })
 
 test('Should not sign up user with invalid email', async () => {
   request(app)
     .post('/users')
     .send({
-      name: "Naoko120",
-      email: "luisemail.com",
-      password: "aprilfeb50D."
+      name: 'Naoko120',
+      email: 'luisemail.com',
+      password: 'aprilfeb50D.',
     })
-    .expect(500)
+    .expect(400)
 })
-
 
 test('Should not sign up user with invalid password', async () => {
   request(app)
     .post('/users')
     .send({
-      name: "Naoko120",
-      email: "luisemail.com",
-      password: "aprilfebpassword."
+      name: 'Naoko120',
+      email: 'luisemail.com',
+      password: 'aprilfebpassword.',
     })
-    .expect(500)
+    .expect(400)
 })
 
 test('Should update valid user fields', async () => {
@@ -74,7 +72,7 @@ test('Should update valid user fields', async () => {
     .patch('/users/me')
     .set('Authorization', `Bearer ${userOne.token}`)
     .send({
-      'name': 'Naoko Banana'
+      name: 'Naoko Banana',
     })
     .expect(200)
   const user = await User.findById(userOneId)
@@ -86,9 +84,9 @@ test('Should not update user with invalid name', async () => {
     .patch('/users/me')
     .set('Authorization', `Bearer ${userOne.token}`)
     .send({
-      'name': 'Naoko123'
+      name: 'Naoko123',
     })
-    .expect(500)
+    .expect(400)
 })
 
 test('Should not update user with invalid email', async () => {
@@ -96,9 +94,9 @@ test('Should not update user with invalid email', async () => {
     .patch('/users/me')
     .set('Authorization', `Bearer ${userOne.token}`)
     .send({
-      'email': 'naoko.com'
+      email: 'naoko.com',
     })
-    .expect(500)
+    .expect(400)
 })
 
 test('Should not update user with invalid password', async () => {
@@ -106,16 +104,16 @@ test('Should not update user with invalid password', async () => {
     .patch('/users/me')
     .set('Authorization', `Bearer ${userOne.token}`)
     .send({
-      'password': 'password123'
+      password: 'password123',
     })
-    .expect(500)
+    .expect(400)
 })
 
 test('Should not update user without auth', async () => {
   await request(app)
     .patch('/users/me')
     .send({
-      'name': 'Naoko Banana'
+      name: 'Naoko Banana',
     })
     .expect(401)
 })
@@ -125,7 +123,7 @@ test('Should not update invalid user fields', async () => {
     .patch('/users/me')
     .set('Authorization', `Bearer ${userOne.token}`)
     .send({
-      location: 'Mexico'
+      location: 'Mexico',
     })
     .expect(400)
 })

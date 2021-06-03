@@ -5,7 +5,7 @@ const cors = require('cors')
 const userRouter = require('./routers/user')
 const taskRouter = require('./routers/task')
 const db = require('./db/mongoose')
-const errorHandler = require('./middleware/error')
+const globalErrorHandler = require('./middleware/error')
 const notFoundHandler = require('./middleware/404')
 // MongoDB connection
 db()
@@ -22,6 +22,6 @@ app.use(taskRouter)
 app.use(notFoundHandler)
 
 // error Handling
-app.use(errorHandler)
+app.use(globalErrorHandler)
 
 module.exports = app
